@@ -108,7 +108,7 @@ app.post('/login/', async (request, response) => {
       let payload = {username: username}
 
       let jwttoken = jwt.sign(payload, 'MY_SECRET_KEY')
-      response.send({jwttoken})
+      response.send({jwttoken: jwttoken})
     } else {
       response.status(400)
       response.send('Invalid password')
