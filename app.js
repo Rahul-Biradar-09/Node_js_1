@@ -144,7 +144,7 @@ app.get('/user/tweets/feed/', authenticatetoken, async (request, response) => {
 app.get('/user/following/', authenticatetoken, async (request, response) => {
   let {username} = request
 
-  let clause = `SELECT user.name AS name,
+  let clause = `SELECT user.name AS name
   FROM user JOIN follower ON user.user_id = follower.following_user_id;
   WHERE user.username = "${username}";`
 
@@ -157,7 +157,7 @@ app.get('/user/following/', authenticatetoken, async (request, response) => {
 app.get('/user/followers/', authenticatetoken, async (request, response) => {
   let {username} = request
 
-  let clause = `SELECT user.name AS name,
+  let clause = `SELECT user.name AS name
   FROM user JOIN follower ON user.user_id = follower.follower_user_id;
   WHERE user.username = "${username}";`
 
