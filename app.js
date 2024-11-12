@@ -2,7 +2,7 @@ let express = require('express')
 let app = express()
 
 let {open} = require('sqlite')
-let db = require('sqlite3')
+let sqlite3 = require('sqlite3')
 
 let bcrypt = require('bcrypt')
 let jwt = require('jsonwebtoken')
@@ -18,7 +18,7 @@ let IntializeTheDatabase = async () => {
   try {
     db_object = await open({
       filename: path_db,
-      driver: db.Database,
+      driver: sqlite3.Database,
     })
 
     app.listen(3000, () => {
@@ -131,9 +131,9 @@ app.get('/user/tweets/feed/', authenticatetoken, async (request, response) => {
   JOIN follower ON tweet.user_id = follower.following_user_id
   WHERE user.username = "${username}"
   GROUP BY tweet.tweet_id
+  ORDER BY tweet.datetime DESC
   LIMIT 4
-  OFFSET 0
-  ORDER BY tweet.datetime DESC;`
+  OFFSET 0;`
 
   let res_object = await db_object.all(clause)
   response.send(res_object)
@@ -145,7 +145,7 @@ app.get('/user/following/', authenticatetoken, async (request, response) => {
   let {username} = request
 
   let clause = `SELECT user.name AS name
-  FROM user JOIN follower ON user.user_id = follower.following_user_id;
+  FROM user JOIN follower ON user.user_id = follower.following_user_id
   WHERE user.username = "${username}";`
 
   let res_object = await db_object.all(clause)
@@ -158,7 +158,7 @@ app.get('/user/followers/', authenticatetoken, async (request, response) => {
   let {username} = request
 
   let clause = `SELECT user.name AS name
-  FROM user JOIN follower ON user.user_id = follower.follower_user_id;
+  FROM user JOIN follower ON user.user_id = follower.follower_user_id
   WHERE user.username = "${username}";`
 
   let res_object = await db_object.all(clause)
@@ -174,7 +174,7 @@ app.get('/tweets/:tweetId/', authenticatetoken, async (request, response) => {
 
   let clause = `SELECT tweet.tweet AS tweet,
   COUNT(like.tweet_id) AS likes,
-  COUNT(reply.tweet.id) AS replies,
+  COUNT(reply.tweet_id) AS replies,
   tweet.date_time AS dateTime
   FROM user JOIN follower ON user.user_id = follower.following_user_id 
   JOIN tweet ON follower.following_user_id = tweet.user_id
@@ -255,7 +255,7 @@ app.get('/user/tweets/', authenticatetoken, async (request, response) => {
 
   let clause = `SELECT tweet.tweet AS tweet,
   COUNT(like.tweet_id) AS likes,
-  COUNT(reply.tweet.id) AS replies,
+  COUNT(reply.tweet_id) AS replies,
   tweet.date_time AS dateTime
   FROM user JOIN reply ON user.user_id = reply.user_id
   JOIN tweet ON reply.tweet_id = tweet.tweet_id 
